@@ -1,12 +1,13 @@
-from dash import Dash, html
+from dash import Dash, html, dcc
 import dash_bootstrap_components as dbc
 
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP])
-
-
 dropdown1 = html.Div([
-    html.Label("Exemple avec dbc.Select :"),
+    html.Div([
+        html.I(className="bi bi-geo-alt-fill me-2"),
+        "Select a state:"
+    ], className="mb-2"),
     dbc.Select(
         id="select-id",
         options=[
@@ -14,30 +15,31 @@ dropdown1 = html.Div([
             {"label": "FL", "value": "FL"},
             {"label": "DC", "value": "DC"},
         ],
-        value="DC", 
+        value="DC",
     )
-], className="mb-4") 
+], className="mb-4")
 
 dropdown2 = html.Div([
-    html.Label("Exemple avec dbc.DropdownMenu :"),
+    html.Div([
+        html.I(className="bi bi-calendar-event me-2"), 
+    ], className="mb-2"),
     dbc.DropdownMenu(
-        label="Options",
+        label="DC", 
         children=[
-            dbc.DropdownMenuItem("Select an option", header=True), 
-            dbc.DropdownMenuItem(divider=True),                 
-            dbc.DropdownMenuItem("CA", id="ca-item"),
-            dbc.DropdownMenuItem("FL", id="fl-item", disabled=True), 
-            dbc.DropdownMenuItem("DC", id="dc-item", active=True),   
+            dbc.DropdownMenuItem("Select an option", header=True),
+            dbc.DropdownMenuItem(divider=True),
+            dbc.DropdownMenuItem("CA"),
+            dbc.DropdownMenuItem("FL", disabled=True),
+            dbc.DropdownMenuItem("DC", active=True),
         ],
-        color="primary",
+        color="light", 
     )
 ])
 
 app.layout = dbc.Container([
-    html.H2("Test des menus déroulants", className="mt-4 mb-4"),
-    dropdown1,  
-    dropdown2   
-], fluid=True)
+    dropdown1,
+    dropdown2
+], className="p-5", style={"maxWidth": "400px"}) 
 
 if __name__ == '__main__':
     app.run(debug=True)
