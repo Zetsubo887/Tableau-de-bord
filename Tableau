@@ -1,0 +1,21 @@
+from dash import Dash, html
+import dash_bootstrap_components as dbc
+
+app = Dash(__name__, external_stylesheets=[dbc.themes.FLATLY])
+
+app.layout = html.Div([
+    html.H1(
+        "New title",
+        style={
+            "textAlign": "center",
+            "color": "white",
+            "padding": "1.5rem",
+            "borderBottom": "3px solid var(--bs-primary)",
+            "backgroundColor": "var(--bs-secondary)",
+            "margin": "0"
+        }
+    )
+], style={"padding": "2rem"}) 
+
+if __name__ == "__main__":
+    app.run(debug=True)
