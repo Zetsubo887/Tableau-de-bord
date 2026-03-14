@@ -1,0 +1,43 @@
+from dash import Dash, html
+import dash_bootstrap_components as dbc
+
+
+app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP])
+
+
+dropdown1 = html.Div([
+    html.Label("Exemple avec dbc.Select :"),
+    dbc.Select(
+        id="select-id",
+        options=[
+            {"label": "CA", "value": "CA"},
+            {"label": "FL", "value": "FL"},
+            {"label": "DC", "value": "DC"},
+        ],
+        value="DC", 
+    )
+], className="mb-4") 
+
+dropdown2 = html.Div([
+    html.Label("Exemple avec dbc.DropdownMenu :"),
+    dbc.DropdownMenu(
+        label="Options",
+        children=[
+            dbc.DropdownMenuItem("Select an option", header=True), 
+            dbc.DropdownMenuItem(divider=True),                 
+            dbc.DropdownMenuItem("CA", id="ca-item"),
+            dbc.DropdownMenuItem("FL", id="fl-item", disabled=True), 
+            dbc.DropdownMenuItem("DC", id="dc-item", active=True),   
+        ],
+        color="primary",
+    )
+])
+
+app.layout = dbc.Container([
+    html.H2("Test des menus déroulants", className="mt-4 mb-4"),
+    dropdown1,  
+    dropdown2   
+], fluid=True)
+
+if __name__ == '__main__':
+    app.run(debug=True)
