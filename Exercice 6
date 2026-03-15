@@ -1,0 +1,71 @@
+import pandas as pd
+from dash import Dash, html, dash_table, dcc
+import dash_bootstrap_components as dbc
+
+# --- 1. PRÉPARATION DES DONNÉES ---
+url = "https://gist.githubusercontent.com/fluret/ac9448085ca978b65f8f53535d2caa97/raw/216956a76aa5625b57f95af3bab97ea0d9ec8b24/data_03.txt"
+df = pd.read_csv(url, sep=';', decimal=',')
+
+# Filtrage pour le continent Americas
+df_americas = df[df['continent'] == 'Americas']
+
+# Sélection des colonnes demandées
+columns_to_show = ['country', 'year', 'lifeExp', 'pop', 'gdpPercap']
+df_final = df_americas[columns_to_show].head(25) # On garde 25 lignes
+
+# --- 2. LAYOUT DE L'APPLICATION ---
+app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+
+app.layout = dbc.Container([
+    
+    # BLOC 1 : Titre (Rectangle bleu isolé)
+    html.Div([
+        html.H1("🌎 Gapminder Americas Data Explorer", 
+                style={'color': 'white', 'fontSize': '26px', 'margin': '0'})
+    ], style={
+        'backgroundColor': '#007BFF', 
+        'padding': '20px', 
+        'textAlign': 'center', 
+        'borderRadius': '10px',
+        'marginBottom': '30px',
+        'marginTop': '20px',
+        'boxShadow': '0 4px 6px rgba(0,0,0,0.1)'
+    }),
+
+    # BLOC 2 : Tableau encapsulé dans une dbc.Card
+    dbc.Card([
+        dbc.CardHeader("Americas Statistics (First 25 rows)", style={'fontWeight': 'bold'}),
+        dbc.CardBody([
+            dash_table.DataTable(
+                data=df_final.to_dict('records'),
+                columns=[{"name": i, "id": i, "selectable": True} for i in df_final.columns],
+                
+                # Fonctionnalités demandées
+                column_selectable="multi", # Colonnes sélectionnables
+                filter_action="native",     # Filtrage natif activé
+                sort_action="native",       # Tri natif (optionnel mais recommandé)
+                page_size=25,               # Affichage de 25 lignes
+                
+                # Style du tableau pour correspondre à l'image
+                style_table={'overflowX': 'auto'},
+                style_cell={
+                    'textAlign': 'left',
+                    'padding': '10px',
+                    'fontFamily': 'sans-serif'
+                },
+                style_header={
+                    'backgroundColor': '#f8f9fa',
+                    'fontWeight': 'bold',
+                    'border': '1px solid #dee2e6'
+                },
+                style_data={
+                    'border': '1px solid #dee2e6'
+                }
+            )
+        ])
+    ], style={'borderRadius': '10px', 'border': '1px solid #DEE2E6', 'boxShadow': '0 4px 6px rgba(0,0,0,0.05)'})
+
+], fluid=False, style={'maxWidth': '1100px'})
+
+if __name__ == '__main__':
+    app.run(debug=True)
