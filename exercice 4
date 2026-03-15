@@ -1,0 +1,9 @@
+import pandas as pd
+
+url = "https://gist.githubusercontent.com/fluret/ac9448085ca978b65f8f53535d2caa97/raw/216956a76aa5625b57f95af3bab97ea0d9ec8b24/"
+df = pd.read_csv(url, sep=';', decimal=',')
+
+df_filtered = df[df['year'] >= 1980]
+resultat = df_filtered.groupby('continent')['lifeExp'].max().reset_index()
+
+print(resultat)
