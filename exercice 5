@@ -1,0 +1,94 @@
+import pandas as pd
+from dash import Dash, html, dcc, Input, Output
+import dash_bootstrap_components as dbc
+import plotly.express as px
+
+# 1. URL et Chargement (Vérifie bien ta connexion internet)
+url = "https://gist.githubusercontent.com/fluret/ac9448085ca978b65f8f53535d2caa97/raw/216956a76aa5625b57f95af3bab97ea0d9ec8b24/data_03.txt"
+
+print("Chargement des données en cours...")
+df = pd.read_csv(url, sep=';', decimal=',')
+
+metrics_map = {
+    'Population': {'col': 'pop', 'agg': 'sum'},
+    'PIB par habitant': {'col': 'gdpPercap', 'agg': 'mean'},
+    'Espérance de vie': {'col': 'lifeExp', 'agg': 'mean'}
+}
+
+# --- 2. LAYOUT ---
+app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+
+app.layout = dbc.Container([
+    
+    # BLOC 1 : Titre (Rectangle bleu)
+    html.Div([
+        html.H1("🌎 Gapminder Global Dashboard", style={'color': 'white', 'fontSize': '28px', 'margin': '0'}),
+        html.P("Analyse interactive par continent", style={'color': 'rgba(255,255,255,0.8)', 'margin': '5px 0 0 0'})
+    ], style={
+        'backgroundColor': '#007BFF', 'padding': '20px', 'textAlign': 'center', 
+        'borderRadius': '10px', 'marginBottom': '20px', 'marginTop': '20px'
+    }),
+
+    dbc.Row([
+        # BLOC 2 : Sélecteur (Rectangle gris à gauche)
+        dbc.Col([
+            html.Div([
+                html.Label("📊 Choisir une mesure :", style={'fontWeight': 'bold', 'marginBottom': '10px'}),
+                dcc.Dropdown(
+                    id='dropdown-metric',
+                    options=[{'label': k, 'value': k} for k in metrics_map.keys()],
+                    value='Population', # Valeur par défaut
+                    clearable=False,
+                    style={'color': 'black'}
+                ),
+            ], style={
+                'backgroundColor': '#F8F9FA', 'padding': '20px', 
+                'borderRadius': '10px', 'border': '1px solid #DEE2E6', 'height': '100%'
+            })
+        ], width=3),
+
+        # BLOC 3 : Graphique (Rectangle noir à droite)
+        dbc.Col([
+            html.Div([
+                dcc.Graph(id='main-graph', config={'displayModeBar': False})
+            ], style={
+                'backgroundColor': '#1E1E1E', 'padding': '10px', 
+                'borderRadius': '10px', 'border': '1px solid #333', 'height': '100%'
+            })
+        ], width=9)
+    ])
+
+], fluid=False, style={'maxWidth': '1100px'})
+
+# --- 3. CALLBACK ---
+@app.callback(
+    Output('main-graph', 'figure'),
+    Input('dropdown-metric', 'value')
+)
+def update_graph(selected_metric):
+    # Récupérer la config (colonne et type d'agrégation)
+    config = metrics_map[selected_metric]
+    col_name = config['col']
+    agg_type = config['agg']
+    
+    # Regroupement dynamique
+    df_grouped = df.groupby(['year', 'continent'])[col_name].agg(agg_type).reset_index()
+    
+    # Création du graphique Plotly
+    fig = px.bar(
+        df_grouped,
+        x="year",
+        y=col_name,
+        color="continent",
+        title=f"{selected_metric} par Continent",
+        template="plotly_dark",
+        barmode="stack"
+    )
+    
+    # Ajustement des marges pour que ça rentre bien dans le bloc
+    fig.update_layout(margin=dict(l=20, r=20, t=50, b=20))
+    
+    return fig
+
+if __name__ == '__main__':
+    app.run(debug=True)
