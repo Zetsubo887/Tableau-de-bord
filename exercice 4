@@ -1,9 +1,44 @@
 import pandas as pd
+from dash import Dash, html, dcc, Input, Output
+import dash_bootstrap_components as dbc
 
-url = "https://gist.githubusercontent.com/fluret/ac9448085ca978b65f8f53535d2caa97/raw/216956a76aa5625b57f95af3bab97ea0d9ec8b24/"
+
+url = "https://gist.githubusercontent.com/fluret/ac9448085ca978b65f8f53535d2caa97/raw/216956a76aa5625b57f95af3bab97ea0d9ec8b24/data_03.txt"
 df = pd.read_csv(url, sep=';', decimal=',')
-
 df_filtered = df[df['year'] >= 1980]
-resultat = df_filtered.groupby('continent')['lifeExp'].max().reset_index()
 
-print(resultat)
+continents = sorted(df_filtered['continent'].unique())
+
+app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+
+app.layout = dbc.Container([
+    html.H1("Life Expectation by continent since 1980", className="text-center my-4"),
+    dcc.RadioItems(
+        id='radio-continent',
+        options=[{'label': c, 'value': c} for c in continents],
+        value=continents[0], 
+        labelStyle={'display': 'block', 'margin-bottom': '10px'} 
+    ),
+
+    html.Br(),
+    html.Div([
+        html.Span("The life expectation in "),
+        dbc.Badge(id='badge-resultat', color="light", text_color="dark", className="ms-1")
+    ], className="lead")
+
+], fluid=True, style={'maxWidth': '800px', 'marginTop': '50px', 'border': '1px solid #ddd', 'padding': '20px', 'borderRadius': '10px'})
+
+
+@app.callback(
+    Output('badge-resultat', 'children'),
+    Input('radio-continent', 'value')
+)
+def update_output(selected_continent):
+    df_cont = df_filtered[df_filtered['continent'] == selected_continent]
+    idx_max = df_cont['lifeExp'].idxmax()
+    row = df_cont.loc[idx_max]
+    
+    return f"{selected_continent} is: {row['lifeExp']:.1f} years."
+
+if __name__ == '__main__':
+    app.run(debug=True)
