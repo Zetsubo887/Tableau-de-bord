@@ -4,18 +4,6 @@ import dash_bootstrap_components as dbc
 # Initialisation avec le thème et les icônes Bootstrap
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP])
 
-# --- 1. LE TITRE (Image 1) ---
-header = html.H1(
-    "New title",
-    style={
-        "textAlign": "center",
-        "color": "white",
-        "padding": "1.5rem",
-        "borderBottom": "3px solid var(--bs-primary)",
-        "backgroundColor": "var(--bs-secondary)",
-        "margin": "0"
-    }
-)
 
 # --- 2. DROPDOWN 1 (Variable dropdown1) ---
 dropdown1 = html.Div([
@@ -63,10 +51,6 @@ app_card = dbc.Card(
                 "### My new application", 
                 className="text-center mb-4"
             ),
-            dcc.Markdown(
-                "Ceci est un exemple de contenu markdown dont le texte doit être justifié pour remplir toute la largeur de la carte de manière élégante.",
-                className="text-justify mb-5"
-            ),
             
             # Intégration des deux variables dropdown
             dropdown1,
@@ -84,7 +68,6 @@ app_card = dbc.Card(
 
 # --- LAYOUT FINAL ---
 app.layout = html.Div([
-    header,
     dbc.Container([
         app_card
     ], fluid=True, style={"maxWidth": "700px"})
